@@ -21,7 +21,7 @@ public class NotificationTask {
     }
 
     public NotificationTask(long id, String textNotification, LocalDateTime timeNotification, Long chatId) {
-        id = id;
+        this.id = id;
         this.textNotification = textNotification;
         this.timeNotification = timeNotification;
         this.chatId = chatId;
@@ -32,7 +32,7 @@ public class NotificationTask {
     }
 
     public void setId(long id) {
-        id = id;
+     this.id = id;
     }
 
     public String getTextNotification() {

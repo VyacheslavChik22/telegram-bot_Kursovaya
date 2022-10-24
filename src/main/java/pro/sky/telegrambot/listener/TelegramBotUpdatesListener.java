@@ -24,16 +24,14 @@ import java.util.regex.Pattern;
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
 
+    private final NotificationRepository notificationRepository;
     public TelegramBotUpdatesListener(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
-
-    @Autowired
-    private NotificationRepository notificationRepository;
-
-    private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
     private static final String TEXT_FOR_START = "Добро пожаловать на борт, ";
     private static final String TEXT_ERROR = "Неправильный формат сообщения, ";
+    private  static final String PAT = "([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)";
 
     @Autowired
     private TelegramBot telegramBot;
@@ -48,7 +46,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
             long chatId = update.message().chat().id();
-            if (update.message().text().equals("/start")) {
+            if (update.message().text().equals("/start") && update.message().text() != null) {
                 SendResponse sendResponse = telegramBot.execute(new SendMessage(chatId, TEXT_FOR_START + update.message().chat().username() + "!"));
                 if (sendResponse.isOk()) {
                     logger.info("Приветственное сообщение отправлено!");
@@ -69,8 +67,7 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
     public void treatmentMessage(Update update) {
         String inputText = update.message().text();
         long chatId = update.message().chat().id();
-        String pat = "([0-9\\.\\:\\s]{16})(\\s)([\\W+]+)";
-        Pattern pattern = Pattern.compile(pat);
+        Pattern pattern = Pattern.compile(PAT);
         Matcher matcher = pattern.matcher(inputText);
         if (matcher.find()) {
             String messageDateFromUser = matcher.group(1);
